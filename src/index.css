@@ -1,0 +1,75 @@
+
+p {
+    padding: 0px;
+    margin: 0px;
+}
+
+.App {
+    display: flex;
+}
+
+/*side menu CSS*/
+.sideMenu {
+    background-color: #16213e;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    min-width: 200px;
+    justify-content: space-between;
+    align-items: start;
+    padding: 10px;
+}
+
+.side-choices {
+    display: flex;
+    flex-direction: column;
+}
+
+.sideMenu button {
+    color: #aaaaaa;
+    background: none;
+    border: none;
+    padding: 6px 5px;
+    border: 1px solid transparent;
+}
+
+button:hover {
+    border: 1px solid;
+}
+
+.side-bottom {
+    display: flex;
+    gap: 4px 8px;
+    align-items: center;
+}
+.github-logo {
+    height: 28px;
+    width: 28px;
+}
+.github-text {
+    display: flex;
+    flex-direction: column;
+    font-size: .9rem;
+}
+/*probably need to make this flex aligned right? To do so need to shove logo/text in their own container.*/
+.min-button {
+    padding-left: 30px; 
+}
+
+/*Main display CSS*/
+.array-container {
+    height: 500px;
+    width: 400px;
+    background-color: #d3d3d3;
+    display: flex;
+    gap: 3px;
+}
+.arrBar {
+    border: 1px solid;
+}
+
+/*Bottom controls CSS*/
+main footer {
+    min-height: 100px;
+    background-color:aliceblue
+}
