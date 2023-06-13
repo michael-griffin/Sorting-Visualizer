@@ -1,13 +1,35 @@
-
+body {
+    margin: 0px;
+    height: 100vh;
+    width: 100%;
+}
 p {
     padding: 0px;
     margin: 0px;
 }
 
-.App {
-    display: flex;
+.bold-choice {
+    font-weight: 700;
+    font-size: 1rem; /*basic is .9, could check to see how formula works, or set those as constant*/
+    color:#ffffff;
 }
 
+#root {
+    height: 100%;
+    width: 100%;
+    margin: 0px;
+}
+.App {
+    height: 100%;
+    width: 100%;
+    display: flex;
+}
+.sidemenu {
+    width: 15%;
+}
+main {
+    width: 100%;
+}
 /*side menu CSS*/
 .sideMenu {
     background-color: #16213e;
@@ -58,9 +80,11 @@ button:hover {
 }
 
 /*Main display CSS*/
-.array-container {
-    height: 500px;
-    width: 400px;
+/*main {} contains array-container + footer*/
+
+main .array-container {
+    height: 75%;
+    width: 100%;
     background-color: #d3d3d3;
     display: flex;
     gap: 3px;
@@ -71,6 +95,7 @@ button:hover {
 
 /*Bottom controls CSS*/
 main footer {
+    height: 25%;
     min-height: 100px;
     background-color:aliceblue
 }

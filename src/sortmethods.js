@@ -2,6 +2,8 @@
 let sortmethods = {}; //key = sort algo name, val = sort algo function
 
 //let unsorted = [1,10,2,7,4,3];
+
+/*
 function swap(arr, ind1, ind2){
     let temp = arr[ind1];
     arr[ind1] = arr[ind2];
@@ -9,14 +11,22 @@ function swap(arr, ind1, ind2){
 
     return arr;
 }
+*/
 
 //BubbleSort
 //Bigger numbers 'bubble up' to the end of the array.
 //Important optimization: Normally loop through the remainder of the array for each element looking for swaps.
 //If we do this once, AND make no swaps, we're sorted, and can stop
-function bubbleSort(arrbase){
+const bubbleSort = (arrbase) => {
     let anims = []; //arr of objects, keys first (ind), second (ind), and type
     let arr = arrbase.slice(0); //needed? precaution: we are passing in a state-variable, so don't want to modify directly.
+
+    const swap = (arr, ind1, ind2) => {
+        let temp = arr[ind1];
+        arr[ind1] = arr[ind2];
+        arr[ind2] = temp;
+        return arr;
+    };
 
     for (let n = arr.length; n > 0; n--){
         let noSwaps = true;
@@ -35,6 +45,7 @@ function bubbleSort(arrbase){
     }
     return anims;
 }
+
 /* 
 //Base bubble sort function (no animation updates)
 function bubbleSort(arr){
@@ -60,15 +71,23 @@ function selectionSort(arrbase){
     let anims = [];
     let cmin;
 
+    function swap(arr, ind1, ind2){
+        let temp = arr[ind1];
+        arr[ind1] = arr[ind2];
+        arr[ind2] = temp;
+    
+        return arr;
+    }
+
     for (let n = 0; n < arr.length; n++){
         cmin = n;
         for (let o = n+1; o < arr.length; o++){
-            anims.push({first: n, second: o, type:'compare'}) 
+            anims.push({first: n, second: o, type:'compare'}); 
             if (arr[o] < arr[cmin]) cmin = o;
         }
         if (cmin !== n){
-            anims.push({first: n, second: cmin, type:'preswap'})
-            anims.push({first: n, second: cmin, type:'swap'})
+            anims.push({first: n, second: cmin, type:'preswap'});
+            anims.push({first: n, second: cmin, type:'swap'});
             swap(arr, n, cmin);
         } 
     }
@@ -93,6 +112,37 @@ function selectionSort(arr){
 
 //InsertionSort
 //Builds up a sorted 'half', then searches that half for the proper spot to insert the next element.
+
+function insertionSort(arrbase){
+    let arr = arrbase.slice(0);
+    let currInd;
+    let anims = [];
+
+    function swap(arr, ind1, ind2){
+        let temp = arr[ind1];
+        arr[ind1] = arr[ind2];
+        arr[ind2] = temp;
+    
+        return arr;
+    }
+
+    for (let n = 1; n < arr.length; n++){
+        currInd = n;
+        for (let o = n-1; o >= 0; o--){
+            if (arr[currInd] <= arr[o]){
+                anims.push({first: n, second: o, type:'preswap'});
+                anims.push({first: n, second: o, type:'swap'});
+                arr = swap(arr,currInd,o);
+                currInd = o; //now curr is at o index
+            } else {
+                anims.push({first: n, second: o, type:'compare'}); 
+            }
+        }
+    }
+    return anims;
+}
+
+/*
 function insertionSort(arr){
     let currInd;
     for (let n = 1; n < arr.length; n++){
@@ -106,6 +156,7 @@ function insertionSort(arr){
     }
     return arr;
 }
+*/
 
 //MergeSort
 
@@ -147,5 +198,11 @@ function mergeSort(arr){
 //Heap Sort
 
 //Radix Sort
+
+sortmethods = {...sortmethods, 
+    bubbleSort,
+    selectionSort,
+    insertionSort
+};
 
 export default sortmethods;
