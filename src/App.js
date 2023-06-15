@@ -4,13 +4,11 @@ import svgIcons from "./icons/svg_icons"
 import sortmethods from "./sortmethods.js"
 
 function App() {
-  let {bubbleSort, selectionSort, insertionSort} = sortmethods;
-  let sortFunc = bubbleSort; //by default, switches with handleSortChoice
-  //console.log(hmm.bubbleFunc([15,40,20,10]));
-  let heightval = 100;
+  let {bubbleSort, selectionSort, insertionSort, mergeSort, heapSort, quickSort} = sortmethods;
+  
   //Still to do:
-    //Merge, Heap, QuickSort.
-  //Refresh button needs to hook up with startarr right now startarr is being run too much
+    //Merge, Heap, (QuickSort might be working?).
+  //Refresh button needs to hook up with startarr. right now startarr might be run too much
     //on every state-change of nbars it runs
     //maybe useMemo with some value that tracks refresh (count? toggle?)
 
@@ -58,34 +56,35 @@ function App() {
   //Lower 3rd: 200-50ms. Middle: 50-10ms, Top: 10-1ms
   //could make a formula that switches based on value. Little messy.
 
-  //for Side-menu handling: (still need to tie this to a CSS class),
-  //Could programmatically generate side-menu JSX on the basis of sortChoice I suppose.
+  //for Side-menu handling: (tied sortChoice to CSS class to highlight chosen-sort), also holds sortFunc
   let [sortChoice, setSortChoice] = useState({
-    bubbleSort: false, selectionSort: false,
+    bubbleChoice: true, selectionChoice: false,
     insertionSort: false, mergeSort: false,
     heapSort: false, quickSort: false,
     sortFunc: bubbleSort
   });
 
   function handleSortChoice(evt) {
-    //console.log(evt.target.id);
     let keyMod = evt.target.id; //bubbleChoice, selectionChoice, 
-    //setSortChoice(prevChoice => ({...prevChoice, [keyMod]: true}));
 
     let newFunc;
     if (keyMod === "bubbleChoice")  newFunc = bubbleSort;
     else if (keyMod === "selectionChoice")  newFunc = selectionSort;
     else if (keyMod === "insertionChoice")  newFunc = insertionSort;
-    //else if (keyMod === "bubbleSort")  newFunc = bubbleSort;
-    //else if (keyMod === "bubbleSort")  newFunc = bubbleSort;
-    //else if (keyMod === "bubbleSort")  newFunc = bubbleSort;
+    else if (keyMod === "mergeChoice")  newFunc = mergeSort; //still needed
+    else if (keyMod === "heapChoice")  newFunc = heapSort; //still needed 
+    else if (keyMod === "quickChoice")  newFunc = quickSort;
+    console.log(keyMod);
     setSortChoice(prevChoice => {
-      let newChoice = {...prevChoice,
+      let newChoice = {...prevChoice};
+      for (let key in newChoice) if (key !== 'sortFunc') newChoice[key] = false;
+      newChoice = {...newChoice,
         [keyMod]: true,
         sortFunc: newFunc
       };
       return newChoice;
-    }); //have to wrap implicit return in parens for object.
+    });
+    console.log('sortChoice var is ', sortChoice)
   }
 
   let [sortSpeed, setSortSpeed] = useState(sortSpeedMax/2);
@@ -146,20 +145,7 @@ function App() {
   //console.log('selectSort animation list is', animArr);
 
 
-  /*
-  let animDemo = [
-    {first: 0, second: 0, type:'nochange'},
-    {first: 0, second: 1, type:'compare'},
-    {first: 0, second: 2, type:'compare'},
-    {first: 0, second: 3, type:'compare'},
-    {first: 1, second: 2, type:'compare'},
-    {first: 1, second: 3, type:'compare'},
-    {first: 2, second: 3, type:'preswap'},
-    {first: 2, second: 3, type:'swap'}
-  ];
-  */
   function animateSort(sortFunc) {    
-    //previous version of App already had animations prepared. Now generating anims here.
     let holding = barsMain.vals;
     let anims = sortFunc(holding);
 
@@ -167,7 +153,8 @@ function App() {
     //Set up setTimeout() functions with a custom callback
       //Callback defines new bar values and colors, and then calls setBars to modify state.
       //Delay is determined by our sortSpeed variable
-    console.log('began animateSort');
+    console.log('animateSort started, sortFunc is:', sortFunc);
+    console.log('began animateSort, anims are:', anims);
     let delay;
     for (let i = 1; i < anims.length; i++){
       //Set up setTimeout callback and delay
@@ -238,14 +225,20 @@ function App() {
   return (
     <div className="App">
       <aside className="sideMenu">
-        <p> Sorting Visualizer</p>
+        <p className="side-header"> Sorting Visualizer</p>
         <div className="side-choices">
-          <button id="bubbleChoice"     onClick={handleSortChoice}>Bubble Sort</button>
-          <button id="selectionChoice"  onClick={handleSortChoice}>Selection Sort</button>
-          <button id="insertionChoice"  onClick={handleSortChoice}>Insertion Sort</button>
-          <button id="mergeChoice"      onClick={handleSortChoice}>Merge Sort</button>
-          <button id="heapChoice"       onClick={handleSortChoice}>Heap Sort</button>
-          <button id="quickChoice"      onClick={handleSortChoice}>Quick Sort</button>
+          <button id="bubbleChoice"     onClick={handleSortChoice}
+          className={sortChoice.bubbleChoice ? "chosen-sort" : null}>Bubble Sort</button>
+          <button id="selectionChoice"  onClick={handleSortChoice}
+          className={sortChoice.selectionChoice ? "chosen-sort" : null}>Selection Sort</button>
+          <button id="insertionChoice"  onClick={handleSortChoice}
+          className={sortChoice.insertionChoice ? "chosen-sort" : null}>Insertion Sort</button>
+          <button id="mergeChoice"      onClick={handleSortChoice}
+          className={sortChoice.mergeChoice ? "chosen-sort" : null}>Merge Sort</button>
+          <button id="heapChoice"       onClick={handleSortChoice}
+          className={sortChoice.heapChoice ? "chosen-sort" : null}>Heap Sort</button>
+          <button id="quickChoice"      onClick={handleSortChoice}
+          className={sortChoice.quickChoice ? "chosen-sort" : null}>Quick Sort</button>
           <button onClick={() => {animateSort(sortChoice.sortFunc)} }>Test Animations</button>
         </div>
         <footer className="side-bottom">

@@ -19,7 +19,7 @@ function swap(arr, ind1, ind2){
 //If we do this once, AND make no swaps, we're sorted, and can stop
 const bubbleSort = (arrbase) => {
     let anims = []; //arr of objects, keys first (ind), second (ind), and type
-    let arr = arrbase.slice(0); //needed? precaution: we are passing in a state-variable, so don't want to modify directly.
+    let arr = arrbase.slice(); //needed? precaution: we are passing in a state-variable, so don't want to modify directly.
 
     const swap = (arr, ind1, ind2) => {
         let temp = arr[ind1];
@@ -67,7 +67,7 @@ function bubbleSort(arr){
 
 //SelectionSort
 function selectionSort(arrbase){
-    let arr = arrbase.slice(0);
+    let arr = arrbase.slice();
     let anims = [];
     let cmin;
 
@@ -114,7 +114,7 @@ function selectionSort(arr){
 //Builds up a sorted 'half', then searches that half for the proper spot to insert the next element.
 
 function insertionSort(arrbase){
-    let arr = arrbase.slice(0);
+    let arr = arrbase.slice();
     let currInd;
     let anims = [];
 
@@ -130,8 +130,8 @@ function insertionSort(arrbase){
         currInd = n;
         for (let o = n-1; o >= 0; o--){
             if (arr[currInd] <= arr[o]){
-                anims.push({first: n, second: o, type:'preswap'});
-                anims.push({first: n, second: o, type:'swap'});
+                anims.push({first: currInd, second: o, type:'preswap'});
+                anims.push({first: currInd, second: o, type:'swap'});
                 arr = swap(arr,currInd,o);
                 currInd = o; //now curr is at o index
             } else {
@@ -143,6 +143,7 @@ function insertionSort(arrbase){
 }
 
 /*
+//base Insertion Sort function
 function insertionSort(arr){
     let currInd;
     for (let n = 1; n < arr.length; n++){
@@ -159,50 +160,215 @@ function insertionSort(arr){
 */
 
 //MergeSort
-
-//First piece: write a function that merges two sorted arrays.
-
 //basic idea: break unsorted into halves, continue until length = 0 or 1.
 //once you have a set of sorted arrays, merge into a larger sorted array (with mergeArrays)
 
+//Issue with the simple version of mergeSort is that it doesn't preserve the indices.
+//Animated version is tweaked to preserve indices in addition to creating animations array.
+function mergeSort(arrbase){
+    let arr = arrbase.slice();
+    const auxarr = arrbase.slice(); //Pulling from this while we modify arr?
+    let anims = [];
+
+    //May need to tweak swap animation for merge: it's pulling from an 'extra'
+    //array, not swapping in place precisely. Maybe just highlight k?
+    //Also may need to adjust how new values are inserted. (perhaps have a firstVal: newVal
+    function merge(arr, istart, mid, iend){
+        //let sorted = [];
+        //let i = 0; let j = 0;
+        //Originally, pushed to a new array and used pointers to separate the two halves
+        //Can still use pointers, they're just no longer starting at 0.
+        let i = istart; //pointer for 'firsthalf' of subarr to sort.
+        let j = mid; //pointer for 'secondhalf' of subarr to sort.
+        let k = istart;
+        let auxarr = arr.slice();
+        while (i < mid && j < iend){
+            if (auxarr[i] <= auxarr[j]) {
+                anims.push({first: k, second: i, type:'preswap'})
+                anims.push({first: k, second: i, type:'swap'})
+                arr[k++] = auxarr[i++]; //sorted.push(arr1[i++]);
+            } else {
+                anims.push({first: k, second: j, type:'preswap'})
+                anims.push({first: k, second: j, type:'swap'})
+                arr[k++] = auxarr[j++]; //sorted.push(arr2[j++]);
+            }
+        }
+        while (i < mid) {
+            anims.push({first: k, second: i, type:'preswap'})
+            anims.push({first: k, second: i, type:'swap'})
+            arr[k++] = auxarr[i++];
+        } 
+        while (j < iend) {
+            anims.push({first: k, second: j, type:'preswap'})
+            anims.push({first: k, second: j, type:'swap'})
+            arr[k++] = auxarr[j++];
+        }
+        return arr;
+    }
+    
+    function mrgSort(arr, istart=0, iend=arr.length){
+        if (iend - istart <= 1) return arr;
+        let mid = Math.floor((istart+iend)/2);
+        
+        mrgSort(arr, istart, mid);
+        mrgSort(arr, mid, iend);
+        merge(arr, istart, mid, iend);
+        return arr;
+    }
+    let sorted = mrgSort(arr);
+    //console.log('sorted arr is', sorted);
+    //console.log('animations generated: ', anims);
+    return anims;
+}
 
 /*
 //Base merge sort function (no animations)
-function merge(arr1, arr2){
-    let sorted = [];
-    let i = 0; let j = 0;    
-    while (i < arr1.length && j < arr2.length){
-        if (arr1[i] <= arr2[j]) sorted.push(arr1[i++]);
-        else sorted.push(arr2[j++]);
-    }
-    if (i < arr1.length) sorted.push(...arr1.slice(i));
-    if (j < arr2.length) sorted.push(...arr2.slice(j));
-    return sorted;
-}
-
 function mergeSort(arr){
-    if (arr.length <= 1) return arr;
-    let mid = Math.floor(arr.length/2);
-    let firsthalf = mergeSort(arr.slice(0,mid));
-    let secondhalf = mergeSort(arr.slice(mid));
-    return merge(firsthalf, secondhalf);
+    function merge(arr1, arr2){
+        let sorted = [];
+        let i = 0; let j = 0;    
+        while (i < arr1.length && j < arr2.length){
+            if (arr1[i] <= arr2[j]) sorted.push(arr1[i++]);
+            else sorted.push(arr2[j++]);
+        }
+        if (i < arr1.length) sorted.push(...arr1.slice(i));
+        if (j < arr2.length) sorted.push(...arr2.slice(j));
+        return sorted;
+    }
+
+    function mrgSort(arr){
+        if (arr.length <= 1) return arr;
+        let mid = Math.floor(arr.length/2);
+        let firsthalf = mrgSort(arr.slice(0,mid));
+        let secondhalf = mrgSort(arr.slice(mid));
+        return merge(firsthalf, secondhalf);
+    }
 }
-//mergeSort([35,12,76,7]);
 */
 
-
+//Heap Sort
+function heapSort(arrbase){
+    let arr = arrbase.slice(0);
+    let anims = [];
+    let count = 0;
+    const swap = (arr, ind1, ind2) => {
+        let temp = arr[ind1];
+        arr[ind1] = arr[ind2];
+        arr[ind2] = temp;
+        count++;
+    }
+    
+    const getLeftInd = i => i * 2 + 1; //0 -> (1,2) 1 -> (3,4)
+    const getRightInd = i => i * 2 + 2;
+    const getParentInd = i => Math.floor((i - 1)/2)
+    
+    //Has child/parent helpers
+    const hasLeftChild = i => getLeftInd(i) < arr.length;
+    const hasRightChild = i => getRightInd(i) < arr.length;
+    const hasParent = i => getParentInd(i) >= 0;
+    
+    //Get parent/child values
+    const leftChild = i => arr[getLeftInd(i)];
+    const rightChild = i => arr[getRightInd(i)];
+    const parent = i => arr[getParentInd(i)];
+    
+    //tutorials helpfully name this 'heapify'
+    const shiftDown = (endOfHeap, i) => {
+        //check if either child > you. If so:
+            //Swap with the larger child. Update index to that of larger child
+            //Repeat.
+        let largest = i;
+        if (getLeftInd(i) < endOfHeap && leftChild(i) > arr[i]){
+            largest = getLeftInd(i);
+        }
+        if (getRightInd(i) < endOfHeap && rightChild(i) > arr[largest]){
+            largest = getRightInd(i);
+        }
+        if (largest !== i){
+            anims.push({first: largest, second: i, type: 'preswap'});
+            anims.push({first: largest, second: i, type: 'swap'});
+            swap(arr, largest, i);
+            shiftDown(largest);
+        }
+    };
+    
+    //Build max heap.
+    let halfway = Math.floor(arr.length/2)-1; 
+    for (let i = halfway; i >= 0; i--){
+        shiftDown(arr.length, i); //endofHeap + index to shift down.
+    }
+    
+    //sort array from max heap    
+    for (let n = arr.length-1; n > 0; n--){
+        //In max heap, max is at ind 0. First step is swap max with final ind
+        anims.push({first: n, second: 0, type: 'preswap'});
+        anims.push({first: n, second: 0, type: 'swap'});
+        swap(arr, n, 0);
+        //Now, new val at ind 0 probably isn't max. have it travel down the heap.
+        shiftDown(n, 0); //Shift down element at 0, in the smaller heap that goes up to n-1.
+    }
+    console.log('sorted arr is:', arr);
+    console.log('count is', count);
+    return anims;
+}
 
 
 //Quick Sort
+function quickSort(arrbase){
+    let arr = arrbase.slice();
+    let anims = [];
+    
+    function pivot(arr, istart, iend){
+        function swap(arr, first, second){
+            let temp = arr[first];
+            arr[first] = arr[second];
+            arr[second] = temp;
+        }
+        
+        let ind = istart; //pivot index;
+        for (let i = istart+1; i <= iend; i++){
+            if (arr[istart] > arr[i]){
+                //This is the weird part. Increments FIRST, so holds off on placing pivot til end.
+                //if arr[i] greater than pivot nothing happens. Else it gets moved backwards:
+                    //still goes in front of previous smaller items. 
+                    //This also moves any unswapped big ones forward
+                ind++;
+                anims.push({first: ind, second: i, type: 'preswap'});
+                anims.push({first: ind, second: i, type: 'swap'});
+                swap(arr, i, ind); 
+            } else {
+                anims.push({first: istart, second: i, type: 'compare'});
+            }
+        }
+        anims.push({first: istart, second: ind, type: 'preswap'});
+        anims.push({first: istart, second: ind, type: 'swap'});
+        swap(arr, istart, ind);
+        return ind;
+    }
+    
 
-//Heap Sort
+    function qckSort(arr, istart=0, iend=arr.length-1){
+        if (iend <= istart) return arr;
+        let mid = pivot(arr, istart, iend);
+        qckSort(arr, istart, mid-1);
+        qckSort(arr, mid+1, iend);
+        return arr;
+    }
+    let sorted = qckSort(arr);
+    return anims;
+}
+
 
 //Radix Sort
 
 sortmethods = {...sortmethods, 
     bubbleSort,
     selectionSort,
-    insertionSort
+    insertionSort,
+    mergeSort, //not working
+    heapSort,
+    quickSort
+
 };
 
 export default sortmethods;

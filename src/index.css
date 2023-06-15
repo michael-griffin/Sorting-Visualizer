@@ -1,19 +1,13 @@
+/*it would be good to set some CSS values as variables. For example text-size:
+    basic is .9     chosen-sort is 1    sideMenu header is 1.5
+    maybe same for color?    
+*/
+
 body {
     margin: 0px;
     height: 100vh;
     width: 100%;
 }
-p {
-    padding: 0px;
-    margin: 0px;
-}
-
-.bold-choice {
-    font-weight: 700;
-    font-size: 1rem; /*basic is .9, could check to see how formula works, or set those as constant*/
-    color:#ffffff;
-}
-
 #root {
     height: 100%;
     width: 100%;
@@ -30,6 +24,12 @@ p {
 main {
     width: 100%;
 }
+
+p {
+    padding: 0px;
+    margin: 0px;
+}
+
 /*side menu CSS*/
 .sideMenu {
     background-color: #16213e;
@@ -38,15 +38,17 @@ main {
     flex-direction: column;
     min-width: 200px;
     justify-content: space-between;
-    align-items: start;
+    align-items: center;
     padding: 10px;
 }
-
+.side-header {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
 .side-choices {
     display: flex;
     flex-direction: column;
 }
-
 .sideMenu button {
     color: #aaaaaa;
     background: none;
@@ -58,7 +60,11 @@ main {
 button:hover {
     border: 1px solid;
 }
-
+.sideMenu .chosen-sort {
+    font-weight: 700;
+    font-size: 1rem;
+    color: #ffffff;
+}
 .side-bottom {
     display: flex;
     gap: 4px 8px;
