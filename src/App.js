@@ -7,7 +7,7 @@ function App() {
   let {bubbleSort, selectionSort, insertionSort, mergeSort, heapSort, quickSort} = sortmethods;
   
   //Still to do:
-    //Merge, Heap, (QuickSort might be working?).
+    //Merge, (QuickSort might be working?).
   //Refresh button needs to hook up with startarr. right now startarr might be run too much
     //on every state-change of nbars it runs
     //maybe useMemo with some value that tracks refresh (count? toggle?)
@@ -32,9 +32,9 @@ function App() {
   //For bottom controls
     //Could add a top header (controls, like in demo)
     
-  const baseColor = 'aqua';
-  const compareColor = "green";
-  const swapColor = "red";
+  const baseColor = '#01cdfe';
+  const compareColor = "#00b159";
+  const swapColor = '#c51f5d';//"#d11141";
   //Could have a 'resting/completed' color, like purple, after sorting is done/before it starts.
 
   //Work out sorting visualizer for bubbleSort
@@ -42,10 +42,12 @@ function App() {
   const barValMin = 5;
   const barValMax = 50;
 
-  const barWidthBase = 800;   //width = base / nbars
+  const barWidthBase = 1100;   //width = (base - gap*nbars) / nbars
+  const pixelGap = 4;
   const numBarsMin = 4;
   const numBarsMax = 100;
   
+
   const sortSpeedMin = 2;  
   const sortSpeedMax = 100; //Should depend on slider for speed!
   const sortSpeedBase = 102;  //speed in ms will be base - speed.
@@ -94,7 +96,7 @@ function App() {
   }
 
   let [numBars, setNumBars] = useState(numBarsMin*3);
-  let barWidth = barWidthBase / numBars; 
+  let barWidth = (barWidthBase - numBars*pixelGap) / numBars; //numbars*4 accounts for gaps between pixels. 
 
 
   function getNewArray(numEls){
@@ -166,10 +168,7 @@ function App() {
       //if (i == 2) console.log('made it past continue');
       //Make the callback function for setTimeout
       let updateBars = () => {
-        //Updates state of bars! Does three things:
-          //Resets colors of previous indices to baseline.
-          //Updates colors for current indices (regardless of type)
-          //Updates bar values for current indices (if type is 'swap')
+        //Updates state of bars! Updates bar values + colors, and resets colors of previous animation. 
         let {first, second, type} = cAnim;
         let {first: prevFirst, second: prevSecond, type: prevType} = prevAnim;
         let {vals: newVals, colors: newColors} = {...barsMain}; //old bars/colors
@@ -218,10 +217,10 @@ function App() {
     return bars;
   };
 
+  //Build bars in JSX, to be placed in array-container.
   let barsJSX = writebarJSX();
 
-  //<div className="arrBar" style={{height: '100px', width: '20px'}}></div>
-  //<div className="arrBar" style={{height: '100px', width: '20px'}}></div>
+
   return (
     <div className="App">
       <aside className="sideMenu">
@@ -242,13 +241,15 @@ function App() {
           <button onClick={() => {animateSort(sortChoice.sortFunc)} }>Test Animations</button>
         </div>
         <footer className="side-bottom">
-          <div className="side-bottom github-logo">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-              <path fillRule="evenodd" clipRule="evenodd" d={svgIcons.github} fill="#fff"/>
-            </svg>
-          </div>
+          <a href="https://github.com/michael-griffin/Sorting-Visualizer">
+            <div className="side-bottom github-logo">    
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                  <path fillRule="evenodd" clipRule="evenodd" d={svgIcons.github} fill="#fff"/>
+                </svg>
+            </div>
+          </a>
           <div className="side-bottom github-text">
-            <p>Michael Griffin's</p>
+            <p>Project's</p>
             <p>Github</p>
           </div>
           <button className="side-bottom min-button">
@@ -265,37 +266,46 @@ function App() {
           {barsJSX /*does 90% of the work*/}        
         </section>
 
-        <footer className="controls">
-          <div className="controls-buttons">
-            <button>
-              <svg className="play-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                <path fillRule="evenodd" clipRule="evenodd" d={svgIcons.play} fill="#000"/>
+        <footer>
+          <div className="controls">
+            <div className="controls-buttons">
+              <button id="play-btn" onClick={ () => {animateSort(sortChoice.sortFunc)} } >
+                <svg id="play-icon" className="svg-controls" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                  <path fillRule="evenodd" clipRule="evenodd" d={svgIcons.play}/>
+                </svg>
+              </button>
+              <button id="pause-btn">
+                <svg id="pause-icon" className="svg-controls" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                  <path fillRule="evenodd" clipRule="evenodd" d={svgIcons.pause}/>
+                </svg>
+              </button>
+            </div>
+            <div className="controls-speed">
+              <svg id="speed-icon" className="svg-controls" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path fillRule="evenodd" clipRule="evenodd" d={svgIcons.speed}/>
               </svg>
-             </button>
-            <button>
-              <svg className="pause-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                <path fillRule="evenodd" clipRule="evenodd" d={svgIcons.pause} fill="#000"/>
+              <div className="speed-slider">
+                <label htmlFor="speed">Sorting Speed</label>
+                <input type="range" name="speed" onChange={handleSpeedChange} value={sortSpeed}
+                  min={sortSpeedMin} max={sortSpeedMax} ></input>
+              </div>
+            </div>
+            <div className="controls-nbars">
+              <svg id="bar-icon" className="svg-controls" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15 15">
+                <path fillRule="evenodd" clipRule="evenodd" d={svgIcons.bars}/>
+              </svg>
+              <div className="nbars-slider">
+                <label htmlFor="nbars"># of Bars</label>
+                <input type="range" name="nbars" onChange={handleNumBarsChange} value={numBars}
+                  min={numBarsMin} max={numBarsMax} ></input>
+              </div>
+            </div>
+            <button id="refresh-btn" onClick={handleRefresh}>
+              <svg id="refresh-icon" className="svg-controls" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path fillRule="evenodd" clipRule="evenodd" d={svgIcons.refresh} fill="#000"/>
               </svg>
             </button>
           </div>
-          <div className="controls-speed">
-            <svg className="speed-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-              <path fillRule="evenodd" clipRule="evenodd" d={svgIcons.speed} fill="#000"/>
-            </svg>
-            <label htmlFor="speed">Sorting Speed</label>
-            <input type="range" name="speed" onChange={handleSpeedChange} value={sortSpeed}
-              min={sortSpeedMin} max={sortSpeedMax} ></input>
-          </div>
-          <div className="controls-nbars">
-            <label htmlFor="nbars"># of Bars</label>
-            <input type="range" name="nbars" onChange={handleNumBarsChange} value={numBars}
-              min={numBarsMin} max={numBarsMax} ></input>
-          </div>
-          <button className="controls-newArray" onClick={handleRefresh}>
-            <svg className="refresh-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-              <path fillRule="evenodd" clipRule="evenodd" d={svgIcons.refresh} fill="#000"/>
-            </svg>
-          </button>
         </footer>
       </main>
     </div>

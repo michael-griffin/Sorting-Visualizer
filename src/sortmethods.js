@@ -248,67 +248,50 @@ function mergeSort(arr){
 
 //Heap Sort
 function heapSort(arrbase){
-    let arr = arrbase.slice(0);
+    let arr = arrbase.slice();
+    let n = arr.length;
     let anims = [];
-    let count = 0;
-    const swap = (arr, ind1, ind2) => {
+    
+    const swap = (ind1, ind2) => {
+        anims.push({first: ind1, second: ind2, type:'preswap'});
+        anims.push({first: ind1, second: ind2, type:'swap'});
         let temp = arr[ind1];
         arr[ind1] = arr[ind2];
         arr[ind2] = temp;
-        count++;
     }
     
-    const getLeftInd = i => i * 2 + 1; //0 -> (1,2) 1 -> (3,4)
-    const getRightInd = i => i * 2 + 2;
-    const getParentInd = i => Math.floor((i - 1)/2)
-    
-    //Has child/parent helpers
-    const hasLeftChild = i => getLeftInd(i) < arr.length;
-    const hasRightChild = i => getRightInd(i) < arr.length;
-    const hasParent = i => getParentInd(i) >= 0;
-    
-    //Get parent/child values
-    const leftChild = i => arr[getLeftInd(i)];
-    const rightChild = i => arr[getRightInd(i)];
-    const parent = i => arr[getParentInd(i)];
-    
-    //tutorials helpfully name this 'heapify'
-    const shiftDown = (endOfHeap, i) => {
-        //check if either child > you. If so:
-            //Swap with the larger child. Update index to that of larger child
-            //Repeat.
+    const shiftDown = (n, i) => {
         let largest = i;
-        if (getLeftInd(i) < endOfHeap && leftChild(i) > arr[i]){
-            largest = getLeftInd(i);
+        let left = 2 * i + 1; //left child index
+        let right = 2 * i + 2; //right child index
+        
+        if (left < n && arr[left] > arr[largest]) {
+            largest = left; 
         }
-        if (getRightInd(i) < endOfHeap && rightChild(i) > arr[largest]){
-            largest = getRightInd(i);
+        if (right < n && arr[right] > arr[largest]) {
+            largest = right; 
         }
-        if (largest !== i){
-            anims.push({first: largest, second: i, type: 'preswap'});
-            anims.push({first: largest, second: i, type: 'swap'});
-            swap(arr, largest, i);
-            shiftDown(largest);
-        }
-    };
-    
-    //Build max heap.
-    let halfway = Math.floor(arr.length/2)-1; 
-    for (let i = halfway; i >= 0; i--){
-        shiftDown(arr.length, i); //endofHeap + index to shift down.
+        
+        // If largest is not parent
+        if (largest != i) {
+            swap(i, largest);           
+            // Recursively heapify the affected sub-tree 
+            shiftDown(n, largest); 
+        } 
     }
-    
-    //sort array from max heap    
-    for (let n = arr.length-1; n > 0; n--){
-        //In max heap, max is at ind 0. First step is swap max with final ind
-        anims.push({first: n, second: 0, type: 'preswap'});
-        anims.push({first: n, second: 0, type: 'swap'});
-        swap(arr, n, 0);
-        //Now, new val at ind 0 probably isn't max. have it travel down the heap.
-        shiftDown(n, 0); //Shift down element at 0, in the smaller heap that goes up to n-1.
+
+    //Build max heap (index starts at the lowest node that is still a parent)
+    for (let i = Math.floor(n / 2 - 1); i >= 0; i--) {
+        shiftDown(n, i); 
     }
-    console.log('sorted arr is:', arr);
-    console.log('count is', count);
+    //sort arr from the newly made heap.
+    for (let i = n - 1; i >= 0; i--) { 
+        swap(i, 0);  // Move current root to end
+        shiftDown(i, 0); //call shiftDown on the new root in the reduced heap 
+    } 
+
+    //console.log('sorted arr is:', arr);
+    //console.log('swap animations are:', anims)
     return anims;
 }
 
