@@ -7,43 +7,26 @@ function App() {
   let {bubbleSort, selectionSort, insertionSort, mergeSort, heapSort, quickSort} = sortmethods;
   
   //Still to do:
-    //Merge, (QuickSort might be working?).
-  //Refresh button needs to hook up with startarr. right now startarr might be run too much
-    //on every state-change of nbars it runs
-    //maybe useMemo with some value that tracks refresh (count? toggle?)
+    //Need play to be unclickable to prevent double animations
 
-  //Need a finish/clean up step for animations.
-  //Excessive remaking of animations array during animate?
-    //Currently, animations array are regenerated as animations play. We really only want a new animation list
-    //when a new array is generated. Not sure whether useEffect/useMemo makes sense here, but if so could set
-    //dependency array equal to the randomly generated array. For now, as long as the animation only runs once
-    //it's fine.
-
-  //Styling wise, couple of options:
-
-  //For animations:
-    //gradient color for bars? (maybe a little too fancy)
-    //value below bars (only appear if barnum < constant)
-  //For side menu
-    //could bring selected to the top
-    //OR could bold, increase text-size. (slightly prefer this)
-    //For above, might make sense to have a separate state for sort choice options (re-make list of buttons?)
-    //For footer, need to fix spacing (should have an overall container with space-between to spread out the stuff?)
-  //For bottom controls
-    //Could add a top header (controls, like in demo)
+  //Styling:
+    //For bars, gradient color based on height with no swap changes looked nice.
+      //bar height is based on pixels, not % of screen.
+    //For 'finishing' sorting, could have a custom animation.
+    //For bottom controls needs some clean up on colors, also play+pause don't stay within box.
+      //Could add a top label (Controls, like in demo)
     
   const baseColor = '#01cdfe';
   const compareColor = "#00b159";
   const swapColor = '#c51f5d';//"#d11141";
   //Could have a 'resting/completed' color, like purple, after sorting is done/before it starts.
 
-  //Work out sorting visualizer for bubbleSort
   const heightmult = 10;      //multiplied by bar value to get height in pixels
   const barValMin = 5;
   const barValMax = 50;
 
   const barWidthBase = 1100;   //width = (base - gap*nbars) / nbars
-  const pixelGap = 4;
+  const pixelGap = 4;          //should match gap CSS in array-container
   const numBarsMin = 4;
   const numBarsMax = 100;
   
@@ -52,7 +35,7 @@ function App() {
   const sortSpeedMax = 100; //Should depend on slider for speed!
   const sortSpeedBase = 102;  //speed in ms will be base - speed.
 
-  //sortspeed formula is: Just subtraction for now, but should have a better idea.
+  //sortspeed formula is: subtraction for now, but should have a better idea.
 
   //what do I want the range to look like?
   //Lower 3rd: 200-50ms. Middle: 50-10ms, Top: 10-1ms
@@ -67,14 +50,14 @@ function App() {
   });
 
   function handleSortChoice(evt) {
-    let keyMod = evt.target.id; //bubbleChoice, selectionChoice, 
+    let keyMod = evt.target.id;
 
     let newFunc;
     if (keyMod === "bubbleChoice")  newFunc = bubbleSort;
     else if (keyMod === "selectionChoice")  newFunc = selectionSort;
     else if (keyMod === "insertionChoice")  newFunc = insertionSort;
-    else if (keyMod === "mergeChoice")  newFunc = mergeSort; //still needed
-    else if (keyMod === "heapChoice")  newFunc = heapSort; //still needed 
+    else if (keyMod === "mergeChoice")  newFunc = mergeSort;
+    else if (keyMod === "heapChoice")  newFunc = heapSort; 
     else if (keyMod === "quickChoice")  newFunc = quickSort;
     console.log(keyMod);
     setSortChoice(prevChoice => {
@@ -86,20 +69,18 @@ function App() {
       };
       return newChoice;
     });
-    console.log('sortChoice var is ', sortChoice)
+    console.log('sortChoice is ', sortChoice)
   }
 
   let [sortSpeed, setSortSpeed] = useState(sortSpeedMax/2);
   function handleSpeedChange(evt) {
-    //console.log(evt.target.value);
     setSortSpeed(evt.target.value);
   }
 
   let [numBars, setNumBars] = useState(numBarsMin*3);
-  let barWidth = (barWidthBase - numBars*pixelGap) / numBars; //numbars*4 accounts for gaps between pixels. 
+  let barWidth = (barWidthBase - numBars*pixelGap) / numBars; //subtraction accounts for gaps between pixels. 
 
-
-  function getNewArray(numEls){
+  function getBarVals(numEls){
     let newArr = [];
     let barRange = barValMax-barValMin;
     for (let n = 0; n < numEls; n++){
@@ -109,47 +90,34 @@ function App() {
     return newArr;
   }
 
-  //let startarr = [40, 25, 10, 5, 30, 20, 35, 37];
-  //let startcolors = Array(startarr.length).fill(baseColor);
-  //const [barsMain, setBarsMain] = useState({vals: startarr, colors: startcolors});
-
   const [barsMain, setBarsMain] = useState({
-    vals: getNewArray(numBars), 
+    vals: getBarVals(numBars), 
     colors: Array(numBars).fill(baseColor)
   });
   
+
   function handleNumBarsChange(evt) {
     let newN = +evt.target.value; //evt.target.value starts as a string.
 
     setNumBars(newN);
     setBarsMain(prevBars => {
       let newbars = {
-        vals: getNewArray(newN), 
+        vals: getBarVals(newN), 
         colors: Array(newN).fill(baseColor) 
       };
       return newbars;
     });
   }
 
-  function handleRefresh(){
-    setBarsMain(prevBars => {
-      let newbars = {
-        vals: getNewArray(numBars), 
-        colors: Array(numBars).fill(baseColor) 
-      };
-      return newbars;
-    });
-  }
+  let timeouts = React.useRef([]); //A record of setTimeouts, used to clear timeouts by their ID.
+  function animateSort(sortFunc) {
 
-
-  //console.log('arr vals is', barsMain.vals);
-  //let animArr = selectionSort(barsMain.vals);
-  //console.log('selectSort animation list is', animArr);
-
-
-  function animateSort(sortFunc) {    
+    //pauseSort(timeouts.current); //Still has lingering color issues if used.
     let holding = barsMain.vals;
     let anims = sortFunc(holding);
+
+    //add tail to anims to reset color to baseline.
+    anims.push({ first: anims[anims.length-1].first, second: anims[anims.length-1].second, type: "baseline" });
 
     //loop through animArr, 
     //Set up setTimeout() functions with a custom callback
@@ -171,22 +139,29 @@ function App() {
         //Updates state of bars! Updates bar values + colors, and resets colors of previous animation. 
         let {first, second, type} = cAnim;
         let {first: prevFirst, second: prevSecond, type: prevType} = prevAnim;
-        let {vals: newVals, colors: newColors} = {...barsMain}; //old bars/colors
+        let {vals: newVals, colors: newColors} = {...barsMain}; //preswap bars/colors
 
+        //Change vals
         if (type === "swap") {
           let temp = newVals[first];
           newVals[first] = newVals[second];
           newVals[second] = temp;
         }
 
-        let newColor = type === "compare" ? compareColor : swapColor; //swapColor if type=swap or preswap
+        //Change color
+        let newColor = baseColor;
+        if (type == "swap" || type == "preswap") {
+          newColor = swapColor;
+        } else if (type == "compare") {
+          newColor = compareColor;
+        }
+        //let newColor = type === "compare" ? compareColor : swapColor; //swapColor if type=swap or preswap
         newColors[prevFirst] = baseColor;
         newColors[prevSecond] = baseColor;
         newColors[first] = newColor;
         newColors[second] = newColor;
 
         setBarsMain(prevBars => {
-          console.log('setBars ran');
           let newBars = {vals: newVals, colors: newColors};
           return newBars; 
         });
@@ -194,12 +169,39 @@ function App() {
 
       //make the setTimeout
       delay = 100 + (sortSpeedBase - sortSpeed)*i;
-      setTimeout(updateBars, delay);
+      //setTimeout(updateBars, delay)
+      timeouts['current'].push(setTimeout(updateBars, delay));
     }
+  }
 
-    //Note: if implementing a pause, can check:
-    //https://stackoverflow.com/questions/8860188/javascript-clear-all-timeouts
-    //This allows you to iteratively clear all timeout functions you set.
+  //https://stackoverflow.com/questions/8860188/javascript-clear-all-timeouts
+  function pauseSort(timeoutIDs) {
+    //timeoutIDs are timeouts.current from useRef().
+    //allows IDs to be maintained between renders. 
+    for (let i=0; i<timeoutIDs.length; i++) {
+      clearTimeout(timeoutIDs[i]);
+    }
+    //We also reset timeouts from useRef
+    timeouts.current = [];
+
+    //Finally, reset bars to baseline color.  //Nicer if this was at start of animate, but can't just copy over 
+    //setState doesn't immediately update state, so animations get based on old state's colors.
+      //A hacky solution would be to initialize a 'fake' barsMain with baseline colors, and work off that for animateSort.
+    setBarsMain(prevBars => {
+      let baselineBars = {...prevBars, colors: Array(numBars).fill(baseColor)};
+      return baselineBars; 
+    });
+  }
+
+  function handleRefresh(timeoutIDs){
+    pauseSort(timeoutIDs);
+    setBarsMain(prevBars => {
+      let newbars = {
+        vals: getBarVals(numBars), 
+        colors: Array(numBars).fill(baseColor) 
+      };
+      return newbars;
+    });
   }
 
   let writebarJSX = () => {
@@ -220,7 +222,7 @@ function App() {
   //Build bars in JSX, to be placed in array-container.
   let barsJSX = writebarJSX();
 
-
+  //<button onClick={() => {animateSort(sortChoice.sortFunc)} }>Test Animations</button>
   return (
     <div className="App">
       <aside className="sideMenu">
@@ -238,7 +240,6 @@ function App() {
           className={sortChoice.heapChoice ? "chosen-sort" : null}>Heap Sort</button>
           <button id="quickChoice"      onClick={handleSortChoice}
           className={sortChoice.quickChoice ? "chosen-sort" : null}>Quick Sort</button>
-          <button onClick={() => {animateSort(sortChoice.sortFunc)} }>Test Animations</button>
         </div>
         <footer className="side-bottom">
           <a href="https://github.com/michael-griffin/Sorting-Visualizer">
@@ -274,7 +275,7 @@ function App() {
                   <path fillRule="evenodd" clipRule="evenodd" d={svgIcons.play}/>
                 </svg>
               </button>
-              <button id="pause-btn">
+              <button id="pause-btn" onClick={ () => {pauseSort(timeouts.current)} }>
                 <svg id="pause-icon" className="svg-controls" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                   <path fillRule="evenodd" clipRule="evenodd" d={svgIcons.pause}/>
                 </svg>
@@ -300,7 +301,7 @@ function App() {
                   min={numBarsMin} max={numBarsMax} ></input>
               </div>
             </div>
-            <button id="refresh-btn" onClick={handleRefresh}>
+            <button id="refresh-btn" onClick={ () => {handleRefresh(timeouts.current)} }>
               <svg id="refresh-icon" className="svg-controls" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                 <path fillRule="evenodd" clipRule="evenodd" d={svgIcons.refresh} fill="#000"/>
               </svg>

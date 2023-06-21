@@ -167,45 +167,54 @@ function insertionSort(arr){
 //Animated version is tweaked to preserve indices in addition to creating animations array.
 function mergeSort(arrbase){
     let arr = arrbase.slice();
-    const auxarr = arrbase.slice(); //Pulling from this while we modify arr?
     let anims = [];
-
-    //May need to tweak swap animation for merge: it's pulling from an 'extra'
-    //array, not swapping in place precisely. Maybe just highlight k?
-    //Also may need to adjust how new values are inserted. (perhaps have a firstVal: newVal
+    function swap(array, ind1, ind2){
+        if (ind1 != ind2) {
+            anims.push({first: ind1, second: ind2, type:'preswap'});
+            anims.push({first: ind1, second: ind2, type:'swap'});
+            let temp = array[ind1];
+            array[ind1] = array[ind2];
+            array[ind2] = temp;
+        }
+        return array;
+    }
+    
+    //New idea: go back to k, i, j. Just use index of to find the real things.
     function merge(arr, istart, mid, iend){
-        //let sorted = [];
-        //let i = 0; let j = 0;
-        //Originally, pushed to a new array and used pointers to separate the two halves
-        //Can still use pointers, they're just no longer starting at 0.
-        let i = istart; //pointer for 'firsthalf' of subarr to sort.
-        let j = mid; //pointer for 'secondhalf' of subarr to sort.
+        let subOne = arr.slice(istart, mid);
+        let subTwo = arr.slice(mid, iend);
+        let i = 0; //pointer for 'subOne' subarr to sort.
+        let j = 0; //pointer for 'subTwo' subarr to sort.
         let k = istart;
-        let auxarr = arr.slice();
-        while (i < mid && j < iend){
-            if (auxarr[i] <= auxarr[j]) {
-                anims.push({first: k, second: i, type:'preswap'})
-                anims.push({first: k, second: i, type:'swap'})
-                arr[k++] = auxarr[i++]; //sorted.push(arr1[i++]);
+        while (i < subOne.length && j < subTwo.length){
+            if (subOne[i] <= subTwo[j]) {
+                let iswap = arr.indexOf(subOne[i], k);
+                arr = swap(arr, k, iswap);
+                k++;
+                i++;
             } else {
-                anims.push({first: k, second: j, type:'preswap'})
-                anims.push({first: k, second: j, type:'swap'})
-                arr[k++] = auxarr[j++]; //sorted.push(arr2[j++]);
+                let iswap = arr.indexOf(subTwo[j], k);
+                arr = swap(arr, k, iswap);
+                k++;
+                j++;
             }
         }
-        while (i < mid) {
-            anims.push({first: k, second: i, type:'preswap'})
-            anims.push({first: k, second: i, type:'swap'})
-            arr[k++] = auxarr[i++];
-        } 
-        while (j < iend) {
-            anims.push({first: k, second: j, type:'preswap'})
-            anims.push({first: k, second: j, type:'swap'})
-            arr[k++] = auxarr[j++];
+    
+        while (i < subOne.length) {
+            let iswap = arr.indexOf(subOne[i], k);
+            arr = swap(arr, k, iswap);
+            k++;
+            i++;
+        }
+        while (j < subTwo.length) {
+            let iswap = arr.indexOf(subTwo[j], k);
+            arr = swap(arr, k, iswap);
+            k++;
+            j++;
         }
         return arr;
     }
-    
+      
     function mrgSort(arr, istart=0, iend=arr.length){
         if (iend - istart <= 1) return arr;
         let mid = Math.floor((istart+iend)/2);
@@ -216,8 +225,8 @@ function mergeSort(arrbase){
         return arr;
     }
     let sorted = mrgSort(arr);
-    //console.log('sorted arr is', sorted);
-    //console.log('animations generated: ', anims);
+    console.log(sorted);
+    console.log(anims);
     return anims;
 }
 
