@@ -1,6 +1,6 @@
 /*it would be good to set some CSS values as variables. For example text-size:
     basic is .9     chosen-sort is 1    sideMenu header is 1.5
-    maybe same for color?    
+    maybe same for color?
 */
 
 body {
@@ -98,7 +98,7 @@ main .array-container {
     padding-left: 2%; /*for some reason, hit screen scrolling issues with padding-bottom. Janky solution in arrbar*/
     background-color: rgb(235, 244, 248);/* #d3d3d3; */
     display: flex;
-    align-items: end; /*forces bars to rest on the 'bottom' of the container'*/
+    align-items: flex-end; /*forces bars to rest on the 'bottom' of the container'*/
     gap: 4px;   /*should match pixelGap in App.js*/
 }
 .arrBar {
@@ -135,7 +135,7 @@ main footer > .controls {
     gap: 8px;
     padding: 0px 12px;
     border-left:  3px solid #66b2b2;
-    border-right: 3px solid #66b2b2; 
+    border-right: 3px solid #66b2b2;
 }
 .speed-slider,.nbars-slider {
     display: flex;
