@@ -142,7 +142,8 @@ function mergeSort(arrbase){
         merge(arr, istart, mid, iend);
         return arr;
     }
-    const sorted = mrgSort(arr);
+    //const sorted = mrgSort(arr);
+    mrgSort(arr);
     return anims;
 }
 
@@ -221,7 +222,8 @@ function quickSort(arrbase){
         qckSort(arr, mid+1, iend);
         return arr;
     }
-    let sorted = qckSort(arr);
+    //let sorted = qckSort(arr);
+    qckSort(arr);
     return anims;
 }
 
