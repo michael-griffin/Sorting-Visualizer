@@ -3,29 +3,24 @@ let sortmethods = {}; //key = sort algo name, val = sort algo function
 
 //let unsorted = [1,10,2,7,4,3];
 
-/*
-function swap(arr, ind1, ind2){
-    let temp = arr[ind1];
-    arr[ind1] = arr[ind2];
-    arr[ind2] = temp;
 
-    return arr;
+function swap(anims, array, ind1, ind2){
+    if (ind1 !== ind2) {
+        anims.push({first: ind1, second: ind2, type:'preswap'});
+        anims.push({first: ind1, second: ind2, type:'swap'});
+        let temp = array[ind1];
+        array[ind1] = array[ind2];
+        array[ind2] = temp;
+    }
+    return array;
 }
-*/
 
 //BubbleSort
 //Bigger numbers 'bubble up' to the end of the array.
 //Stops early: if no swaps, we're sorted.
-const bubbleSort = (arrbase) => {
+function bubbleSort(arrbase) {
     let anims = []; //arr of objects, keys first (ind), second (ind), and type
     let arr = arrbase.slice(); //precaution, since passing in a state-variable
-
-    const swap = (arr, ind1, ind2) => {
-        let temp = arr[ind1];
-        arr[ind1] = arr[ind2];
-        arr[ind2] = temp;
-        return arr;
-    };
 
     for (let n = arr.length; n > 0; n--){
         let noSwaps = true;
@@ -33,9 +28,7 @@ const bubbleSort = (arrbase) => {
             //if right neighbor < left, swap (then when o increments, a
             //large number can get swapped up again)
             if (arr[o] > arr[o+1]) { //if swap, add TWO animations: pre-swap + swap
-                anims.push({first: o, second: o+1, type:'preswap'})
-                anims.push({first: o, second: o+1, type:'swap'})
-                arr = swap(arr, o, o+1);
+                arr = swap(anims, arr, o, o+1);
                 noSwaps = false;
             } else { //if no swap, add compare anim
                 anims.push({first: o, second: o+1, type:'compare'})
@@ -53,14 +46,6 @@ function selectionSort(arrbase){
     let anims = [];
     let cmin;
 
-    function swap(arr, ind1, ind2){
-        let temp = arr[ind1];
-        arr[ind1] = arr[ind2];
-        arr[ind2] = temp;
-
-        return arr;
-    }
-
     for (let n = 0; n < arr.length; n++){
         cmin = n;
         for (let o = n+1; o < arr.length; o++){
@@ -68,9 +53,7 @@ function selectionSort(arrbase){
             if (arr[o] < arr[cmin]) cmin = o;
         }
         if (cmin !== n){
-            anims.push({first: n, second: cmin, type:'preswap'});
-            anims.push({first: n, second: cmin, type:'swap'});
-            swap(arr, n, cmin);
+            swap(anims, arr, n, cmin);
         }
     }
     return anims;
@@ -87,21 +70,12 @@ function insertionSort(arrbase){
     let currInd;
     let anims = [];
 
-    function swap(arr, ind1, ind2){
-        let temp = arr[ind1];
-        arr[ind1] = arr[ind2];
-        arr[ind2] = temp;
-
-        return arr;
-    }
 
     for (let n = 1; n < arr.length; n++){
         currInd = n;
         for (let o = n-1; o >= 0; o--){
             if (arr[currInd] <= arr[o]){
-                anims.push({first: currInd, second: o, type:'preswap'});
-                anims.push({first: currInd, second: o, type:'swap'});
-                arr = swap(arr,currInd,o);
+                arr = swap(anims, arr, currInd, o);
                 currInd = o; //now curr is at o index
             } else {
                 anims.push({first: n, second: o, type:'compare'});
@@ -122,16 +96,6 @@ function insertionSort(arrbase){
 function mergeSort(arrbase){
     let arr = arrbase.slice();
     let anims = [];
-    function swap(array, ind1, ind2){
-        if (ind1 != ind2) {
-            anims.push({first: ind1, second: ind2, type:'preswap'});
-            anims.push({first: ind1, second: ind2, type:'swap'});
-            let temp = array[ind1];
-            array[ind1] = array[ind2];
-            array[ind2] = temp;
-        }
-        return array;
-    }
 
     //New idea: go back to k, i, j. Just use index of to find the real things.
     function merge(arr, istart, mid, iend){
@@ -143,12 +107,12 @@ function mergeSort(arrbase){
         while (i < subOne.length && j < subTwo.length){
             if (subOne[i] <= subTwo[j]) {
                 let iswap = arr.indexOf(subOne[i], k);
-                arr = swap(arr, k, iswap);
+                arr = swap(anims, arr, k, iswap);
                 k++;
                 i++;
             } else {
                 let iswap = arr.indexOf(subTwo[j], k);
-                arr = swap(arr, k, iswap);
+                arr = swap(anims, arr, k, iswap);
                 k++;
                 j++;
             }
@@ -156,13 +120,13 @@ function mergeSort(arrbase){
 
         while (i < subOne.length) {
             let iswap = arr.indexOf(subOne[i], k);
-            arr = swap(arr, k, iswap);
+            arr = swap(anims, arr, k, iswap);
             k++;
             i++;
         }
         while (j < subTwo.length) {
             let iswap = arr.indexOf(subTwo[j], k);
-            arr = swap(arr, k, iswap);
+            arr = swap(anims, arr, k, iswap);
             k++;
             j++;
         }
@@ -178,9 +142,7 @@ function mergeSort(arrbase){
         merge(arr, istart, mid, iend);
         return arr;
     }
-    let sorted = mrgSort(arr);
-    console.log(sorted);
-    console.log(anims);
+    const sorted = mrgSort(arr);
     return anims;
 }
 
@@ -192,13 +154,6 @@ function heapSort(arrbase){
     let n = arr.length;
     let anims = [];
 
-    const swap = (ind1, ind2) => {
-        anims.push({first: ind1, second: ind2, type:'preswap'});
-        anims.push({first: ind1, second: ind2, type:'swap'});
-        let temp = arr[ind1];
-        arr[ind1] = arr[ind2];
-        arr[ind2] = temp;
-    }
 
     const shiftDown = (n, i) => {
         let largest = i;
@@ -213,8 +168,8 @@ function heapSort(arrbase){
         }
 
         // If largest is not parent
-        if (largest != i) {
-            swap(i, largest);
+        if (largest !== i) {
+            arr = swap(anims, arr, i, largest);
             // Recursively heapify the affected sub-tree
             shiftDown(n, largest);
         }
@@ -226,12 +181,10 @@ function heapSort(arrbase){
     }
     //sort arr from the newly made heap.
     for (let i = n - 1; i >= 0; i--) {
-        swap(i, 0);  // Move current root to end
+        arr = swap(anims, arr, i, 0);  // Move current root to end
         shiftDown(i, 0); //call shiftDown on the new root in the reduced heap
     }
 
-    //console.log('sorted arr is:', arr);
-    //console.log('swap animations are:', anims)
     return anims;
 }
 
@@ -242,11 +195,6 @@ function quickSort(arrbase){
     let anims = [];
 
     function pivot(arr, istart, iend){
-        function swap(arr, first, second){
-            let temp = arr[first];
-            arr[first] = arr[second];
-            arr[second] = temp;
-        }
 
         let ind = istart; //pivot index;
         for (let i = istart+1; i <= iend; i++){
@@ -256,16 +204,12 @@ function quickSort(arrbase){
                 //Else it gets moved backwards.
                 //This also moves any unswapped big ones forward
                 ind++;
-                anims.push({first: ind, second: i, type: 'preswap'});
-                anims.push({first: ind, second: i, type: 'swap'});
-                swap(arr, i, ind);
+                swap(anims, arr, i, ind);
             } else {
                 anims.push({first: istart, second: i, type: 'compare'});
             }
         }
-        anims.push({first: istart, second: ind, type: 'preswap'});
-        anims.push({first: istart, second: ind, type: 'swap'});
-        swap(arr, istart, ind);
+        swap(anims, arr, istart, ind);
         return ind;
     }
 
@@ -283,14 +227,13 @@ function quickSort(arrbase){
 
 
 
-sortmethods = {...sortmethods,
+sortmethods = {
     bubbleSort,
     selectionSort,
     insertionSort,
     mergeSort,
     heapSort,
     quickSort
-
 };
 
 export default sortmethods;
