@@ -217,7 +217,7 @@ function App() {
   //<button onClick={() => {animateSort(sortChoice.sortFunc)} }>Test Animations</button>
   return (
     <div className="App">
-      <aside className="sideMenu">
+      <aside className="side-menu">
         <p className="side-header"> Sorting Visualizer</p>
         <div className="side-choices">
           <button id="bubbleChoice"     onClick={handleSortChoice}
@@ -245,11 +245,11 @@ function App() {
             <p>Project's</p>
             <p>Github</p>
           </div>
-          <button className="side-bottom min-button">
+          {/* <button className="side-bottom min-button">
             <svg className="play-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
               <path fillRule="evenodd" clipRule="evenodd" d={svgIcons.minimize} fill="#fff"/>
             </svg>
-          </button>
+          </button> */}
         </footer>
 
       </aside>

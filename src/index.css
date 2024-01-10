@@ -1,28 +1,27 @@
-/*it would be good to set some CSS values as variables. For example text-size:
-    basic is .9     chosen-sort is 1    sideMenu header is 1.5
-    maybe same for color?
-*/
 
+* {
+    box-sizing: border-box;
+    margin: 0;
+}
 body {
-    margin: 0px;
     height: 100vh;
     width: 100%;
 }
 #root {
     height: 100%;
     width: 100%;
-    margin: 0px;
 }
 .App {
     height: 100%;
     width: 100%;
     display: flex;
 }
-.sidemenu {
-    width: 15%;
+
+.side-menu {
+    min-width: 220px;
 }
 main {
-    width: 100%;
+    width: calc(100% - 220px);
 }
 
 p {
@@ -31,12 +30,11 @@ p {
 }
 
 /*side menu CSS*/
-.sideMenu {
+.side-menu {
     background-color: #16213e;
     color: #ffffff;
     display: flex;
     flex-direction: column;
-    min-width: 200px;
     justify-content: space-between;
     align-items: center;
     padding: 10px;
@@ -49,7 +47,7 @@ p {
     display: flex;
     flex-direction: column;
 }
-.sideMenu button {
+.side-menu button {
     color: #aaaaaa;
     background: none;
     border: none;
@@ -61,7 +59,7 @@ p {
 button:hover {
     border: 1px solid;
 }
-.sideMenu .chosen-sort {
+.side-menu .chosen-sort {
     font-weight: 700;
     font-size: 1.1rem;
     color: #ffffff;
@@ -90,13 +88,18 @@ button:hover {
     border-radius: 5px;
 }
 
+
+
 /* Main display CSS */
-/* main {} contains array-container + footer */
+/* main contains array-container + footer */
+main {
+    background-color: #ebf4f8;
+}
+
 main .array-container {
     height: 75%;
     width: 98%;
     padding-left: 2%; /*for some reason, hit screen scrolling issues with padding-bottom. Janky solution in arrbar*/
-    background-color: rgb(235, 244, 248);/* #d3d3d3; */
     display: flex;
     align-items: flex-end; /*forces bars to rest on the 'bottom' of the container'*/
     gap: 4px;   /*should match pixelGap in App.js*/
@@ -118,7 +121,8 @@ main footer {
 main footer > .controls {
     background-color: aliceblue;
     width: 50%;
-    height: 60%;
+    min-width: 500px;
+    height: 65%;
     border: 4px solid #d11141;
     border-radius: 10px;
     display: flex;
