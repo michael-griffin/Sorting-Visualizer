@@ -20,7 +20,7 @@ function App() {
 
   const heightmult = 10;      //multiplied by bar value to get height in pixels
   const barValMin = 5;
-  const barValMax = 50;
+  const barValMax = 45;
 
   const barWidthBase = 1100;   //width = (base - gap*nbars) / nbars
   const pixelGap = 4;          //should match gap CSS in array-container
