@@ -6,6 +6,13 @@ This project was an attempt to practice coding some of the sorting algorithms I'
 
 The site is built in React. The algorithms build a set of 'sorting instructions' that the site will animate through, rather than sort the array itself. Each comparison + swap is kept track of, and then 'played' with a series of setTimeout functions.
 
+### Local Setup
+
+To install dependencies and run app:
+
+    npm install
+    npm start
+
 ## Future Directions
 Compare Algorithms: Display multiple algorithms sorting at once, in a race to finish first.
 
